@@ -118,22 +118,21 @@ demand from the Actions tab:
 2. refuse it if it isn't an array or has *fewer* puzzles than the current file
 3. `node validate.js` — aborts only if nothing playable survives
 4. stop early if nothing changed
-5. `node build.js`, commit `puzzles.json` + `puzzles.js`, then `./deploy.sh`
+5. `node build.js`, then commit `puzzles.json` + `puzzles.js`
 
 Step 2 is the guard that matters: a truncated response or an HTML error page
 would otherwise overwrite a working archive. Both cases are rejected before the
 file is replaced.
 
-The deploy step runs the normal `deploy.sh`, so the Access gate check applies to
-automated deploys too — a missing gate stops the workflow rather than publishing
-the archive.
+**No secrets or credentials are required.** The workflow only reads from
+upstream and writes to git. Deploying is not its job: the Pages project is
+connected to this repo, so Cloudflare builds and publishes on its own when the
+commit lands.
 
-**Required repository secrets** (Settings → Secrets and variables → Actions):
-
-| Secret | |
-|---|---|
-| `CLOUDFLARE_API_TOKEN` | token with the *Cloudflare Pages: Edit* permission |
-| `CLOUDFLARE_ACCOUNT_ID` | the Cloudflare account id |
+That also means a Git-triggered build never runs `deploy.sh`, so its
+fail-closed Access check does not cover the automated path. Every commit
+publishes. The only thing gating the archive is Cloudflare Access on the
+project — `./deploy.sh --check` verifies that independently.
 
 ### Data loading
 

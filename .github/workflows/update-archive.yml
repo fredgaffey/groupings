@@ -1,11 +1,15 @@
-# Pulls the upstream archive, validates it, and redeploys if it changed.
+# Pulls the upstream archive, validates it, and commits it if it changed.
 #
 # The site serves its own copy of the data — nothing is fetched from a third
 # party at runtime — so staying current is this workflow's job.
 #
-# Requires two repository secrets (Settings > Secrets and variables > Actions):
-#   CLOUDFLARE_API_TOKEN   token with the "Cloudflare Pages: Edit" permission
-#   CLOUDFLARE_ACCOUNT_ID  REDACTED
+# Deploying is NOT done here. The Pages project is connected to this repo, so
+# Cloudflare builds and publishes on its own whenever the commit below lands.
+# No secrets are needed: this workflow only reads upstream and writes to git.
+#
+# Note that a Git-triggered build never runs deploy.sh, so its fail-closed
+# Access check does not protect this path. Every commit publishes; the only
+# thing gating the archive is Cloudflare Access on the project itself.
 name: Update archive
 
 on:
@@ -81,12 +85,3 @@ jobs:
 
           Automated by .github/workflows/update-archive.yml"
           git push
-
-      - name: Deploy
-        if: steps.diff.outputs.changed == 'true'
-        # deploy.sh fails closed if the Pages URLs are not behind Access, so a
-        # missing gate stops the deploy here rather than publishing the archive.
-        run: ./deploy.sh
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

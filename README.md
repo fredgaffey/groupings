@@ -107,6 +107,30 @@ once, sixteen distinct upper-case words.
 This is the same shape the common community Connections datasets use, so a
 dump in that format drops straight in — replace `puzzles.json` wholesale.
 
+### Auto-updating
+
+The game fetches the archive live from the upstream project, so new puzzles
+appear without redeploying:
+
+```
+https://raw.githubusercontent.com/Eyefyre/NYT-Connections-Answers/main/connections.json
+```
+
+That host sends `access-control-allow-origin: *`, so the browser can read it
+directly. Sources are tried best-first, each falling through to the next:
+
+1. **fresh cache** — fetched within 6h, kept in `localStorage`
+2. **upstream** — the live archive (8s timeout)
+3. **stale cache** — when the network is down
+4. **local `puzzles.json`** — whatever was last committed
+5. **bundled copy** — `PUZZLES_EMBEDDED`, for `file://`
+
+The archive sheet shows which source was used and when. Normalization runs
+before caching, so the repair work happens once per fetch rather than per load.
+
+Because the data arrives at runtime, the committed `puzzles.json` is now only a
+fallback — it does not need refreshing for the game to stay current.
+
 ### Data loading
 
 `fetch()` is blocked on `file://` URLs, so the game can't read the JSON when you

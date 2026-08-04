@@ -149,8 +149,15 @@ body {
 .tile:focus-visible { outline: 3px solid var(--l2); outline-offset: 2px; }
 .tile:active { transform: scale(0.97); }
 
-.tile.sm { font-size: clamp(0.62rem, 2.9vw, 0.87rem); }
-.tile.xs { font-size: clamp(0.54rem, 2.5vw, 0.76rem); letter-spacing: 0; }
+/* fitText sets the span's font-size in px; these keep long phrases wrapping
+   sanely inside the tile rather than clipping or forcing it wider. */
+.tile-text {
+  display: block;
+  width: 100%;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+}
 
 .tile.on {
   background: var(--tile-on);
@@ -192,14 +199,25 @@ body {
 .band.l3 { background: var(--l3); }
 
 .band-name {
-  font-size: clamp(0.72rem, 3vw, 0.95rem);
+  font-size: clamp(0.68rem, 2.7vw, 0.92rem);
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+  overflow-wrap: break-word;
 }
 .band-words {
-  font-size: clamp(0.68rem, 2.8vw, 0.9rem);
+  font-size: clamp(0.62rem, 2.4vw, 0.85rem);
   letter-spacing: 0.02em;
+  overflow-wrap: break-word;
+}
+
+/* Long phrase answers need the room; let tall bands grow rather than clip. */
+.band {
+  aspect-ratio: auto;
+  min-height: max(64px, 15vw);
+}
+@media (min-width: 640px) {
+  .band { min-height: 92px; }
 }
 
 /* ---------- status ---------- */

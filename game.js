@@ -158,7 +158,50 @@ function render() {
 
   renderDots();
   renderControls();
+  fitAll();
 }
+
+/*
+ * Answers range from 2 characters to full phrases, so a fixed size (or a
+ * length-bucketed one) either clips the long ones or wastes the short ones.
+ * Measure instead: start at the ideal size and step down until the text fits
+ * its tile in both axes.
+ */
+const FIT_MAX = 17;
+const FIT_MIN = 7;
+
+function fitText(tile) {
+  const label = tile.firstElementChild;
+  if (!label) return;
+
+  const style = getComputedStyle(tile);
+  const availH = tile.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom);
+  const availW = tile.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+  if (availH <= 0 || availW <= 0) return; // not laid out yet
+
+  let size = FIT_MAX;
+  label.style.fontSize = `${size}px`;
+  while (
+    size > FIT_MIN &&
+    (label.scrollHeight > availH || label.scrollWidth > availW)
+  ) {
+    size -= 0.5;
+    label.style.fontSize = `${size}px`;
+  }
+}
+
+function fitAll() {
+  // Wait for layout so clientHeight/scrollHeight are meaningful.
+  requestAnimationFrame(() => {
+    for (const tile of el.board.querySelectorAll(".tile")) fitText(tile);
+  });
+}
+
+let resizeTimer;
+window.addEventListener("resize", () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(fitAll, 120);
+});
 
 function bandFor(group) {
   const band = document.createElement("div");
@@ -180,11 +223,13 @@ function tileFor(word, index) {
   const tile = document.createElement("button");
   tile.type = "button";
   tile.className = "tile";
-  if (word.length > 10) tile.classList.add("xs");
-  else if (word.length > 7) tile.classList.add("sm");
   if (state.selected.includes(word)) tile.classList.add("on");
 
-  tile.textContent = word;
+  // Text lives in a span so fitText can measure it against the tile's box.
+  const label = document.createElement("span");
+  label.className = "tile-text";
+  label.textContent = word;
+  tile.append(label);
   tile.dataset.word = word;
   tile.setAttribute("aria-pressed", String(state.selected.includes(word)));
   tile.tabIndex = index === state.cursor ? 0 : -1;
@@ -509,15 +554,54 @@ document.addEventListener("keydown", onKeydown);
  * data; regenerate with `node bundle.js` after editing the JSON.
  */
 async function loadPuzzles() {
+  let data;
   try {
     const res = await fetch("puzzles.json", { cache: "no-cache" });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    if (Array.isArray(data) && data.length) return data;
-    throw new Error("puzzles.json is empty or not an array");
+    data = await res.json();
+    if (!Array.isArray(data) || !data.length) throw new Error("empty or not an array");
   } catch {
-    return typeof PUZZLES_EMBEDDED !== "undefined" ? PUZZLES_EMBEDDED : [];
+    data = typeof PUZZLES_EMBEDDED !== "undefined" ? PUZZLES_EMBEDDED : [];
   }
+  return normalize(data);
+}
+
+/*
+ * Real-world archive dumps are ragged, so repair what's repairable and drop
+ * what isn't rather than letting one bad record break the board.
+ *
+ * The important case: some dumps lose the difficulty ranking and write
+ * level: -1 across all four groups. Array order still carries the ranking
+ * (easiest first), so fall back to index. Verified against this archive —
+ * every puzzle that *did* have real levels was already in 0,1,2,3 order.
+ */
+function normalize(raw) {
+  const out = [];
+
+  for (const p of raw) {
+    if (!p || !Array.isArray(p.answers) || p.answers.length !== 4) continue;
+
+    const answers = p.answers.map((a, i) => ({
+      // -1 (or any non-0..3 value) means the dump lost the ranking; use position.
+      level: Number.isInteger(a.level) && a.level >= 0 && a.level <= 3 ? a.level : i,
+      group: String(a.group ?? "").trim(),
+      members: (a.members || []).map((m) => String(m).trim().toUpperCase())
+    }));
+
+    // Every group needs 4 non-empty words, a name, and one of each level.
+    const wellFormed =
+      answers.every((a) => a.group && a.members.length === 4 && a.members.every(Boolean)) &&
+      String(answers.map((a) => a.level).sort()) === "0,1,2,3";
+    if (!wellFormed) continue;
+
+    // A repeated word makes the puzzle ambiguous — it can't be solved as intended.
+    const words = answers.flatMap((a) => a.members);
+    if (new Set(words).size !== 16) continue;
+
+    out.push({ id: p.id, date: p.date, answers });
+  }
+
+  return out.sort((a, b) => a.date.localeCompare(b.date));
 }
 
 // Open on today's puzzle if there is one, else the most recent past one.

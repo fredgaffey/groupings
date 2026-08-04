@@ -20,7 +20,44 @@ Opening `index.html` directly off disk also works — see *Data loading* below.
 | `puzzles.json` | **the puzzle archive — source of truth** |
 | `puzzles.js` | generated mirror of the JSON, for `file://` use |
 | `bundle.js` | `node bundle.js` — regenerates `puzzles.js` from the JSON |
-| `validate.js` | `node validate.js` — checks the archive is well-formed |
+| `build.js` | `node build.js` — validates, bundles, stages `dist/` |
+| `validate.js` | `node validate.js` — reports on archive health |
+| `deploy.sh` | build + deploy to Cloudflare Pages |
+
+## Deploying
+
+```
+./deploy.sh              # build, verify the Access gate, deploy
+./deploy.sh --check      # verify the gate only, deploy nothing
+./deploy.sh --public     # deploy without requiring a gate
+```
+
+`build.js` stages `dist/` with only the five runtime files. This matters:
+`wrangler pages deploy` does **not** honour `.assetsignore` (that's a Workers
+static-assets feature), so pointing it at the repo root publishes `README.md`,
+`validate.js` and `bundle.js` as well.
+
+### The gate check
+
+Pages serves the production hostname *and* a permanent per-deployment hash URL
+(`<hash>.<project>.pages.dev`) for every deploy you make. These are covered by
+**separate** Cloudflare Access configuration, and the hash URLs accumulate — one
+per deployment, each serving a complete copy of `puzzles.json` forever.
+
+So `deploy.sh` fails closed. It enumerates the production URL, `/puzzles.json`,
+and the newest hash URL, and aborts before uploading if any of them answers with
+content instead of an Access challenge. After deploying it re-checks the *new*
+hash URL, since a fresh deployment mints a URL that didn't exist at preflight.
+
+Gating requires both halves, and missing the second is the easy mistake:
+
+1. **Zero Trust → Access → Applications** — an application for
+   `<project>.pages.dev` (production)
+2. **Pages → project → Settings** — enable Access on preview deployments,
+   covering the `*.<project>.pages.dev` hash URLs
+
+Use `--public` only when the archive in `puzzles.json` is content you're
+entitled to publish openly.
 
 ## Gameplay
 

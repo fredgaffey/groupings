@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Groupings — a word grouping game</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="topbar">
+  <button class="icon-btn" id="btn-archive" aria-label="Open the puzzle archive">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18v4H3zM5 9h14v10H5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 13h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+  </button>
+  <h1 class="wordmark">Groupings</h1>
+  <button class="icon-btn" id="btn-help" aria-label="How to play">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.2 2.4c-.6.2-.9.7-.9 1.3v.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="16.6" r="1.05" fill="currentColor"/></svg>
+  </button>
+</header>
+
+<main class="stage">
+  <p class="tagline">Create four groups of four.</p>
+  <p class="puzzle-label" id="puzzle-label"></p>
+
+  <div class="board" id="board" role="group" aria-label="Puzzle board"></div>
+
+  <p class="toast" id="toast" role="status" aria-live="polite"></p>
+
+  <div class="mistakes" id="mistakes-row">
+    <span class="mistakes-label">Mistakes remaining:</span>
+    <span class="dots" id="dots" aria-live="polite"></span>
+  </div>
+
+  <div class="controls" id="controls">
+    <button class="btn" id="btn-shuffle">Shuffle</button>
+    <button class="btn" id="btn-deselect" disabled>Deselect all</button>
+    <button class="btn btn-primary" id="btn-submit" disabled>Submit</button>
+  </div>
+
+  <div class="endgame" id="endgame" hidden>
+    <p class="endgame-title" id="endgame-title"></p>
+    <pre class="share-grid" id="share-grid"></pre>
+    <div class="controls">
+      <button class="btn btn-primary" id="btn-share">Copy results</button>
+      <button class="btn" id="btn-archive-2">Play another</button>
+    </div>
+  </div>
+</main>
+
+<!-- Archive -->
+<div class="sheet" id="sheet-archive" hidden>
+  <div class="sheet-backdrop" data-close></div>
+  <section class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="archive-title">
+    <header class="sheet-head">
+      <h2 id="archive-title">Archive</h2>
+      <button class="icon-btn" data-close aria-label="Close">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </header>
+    <p class="sheet-note" id="archive-summary"></p>
+    <ol class="archive-list" id="archive-list"></ol>
+  </section>
+</div>
+
+<!-- Help -->
+<div class="sheet" id="sheet-help" hidden>
+  <div class="sheet-backdrop" data-close></div>
+  <section class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="help-title">
+    <header class="sheet-head">
+      <h2 id="help-title">How to play</h2>
+      <button class="icon-btn" data-close aria-label="Close">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </header>
+    <div class="help-body">
+      <p>Find the four groups of four words that share something.</p>
+      <ul>
+        <li>Select four tiles, then hit <strong>Submit</strong> to check them.</li>
+        <li>Get all four groups before you make four mistakes.</li>
+        <li>If you have three of a group right, you'll be told you're <em>one away</em>.</li>
+        <li>Every puzzle has exactly one solution. Words are chosen to look like they fit more than one group.</li>
+      </ul>
+      <p class="help-legend">Groups are colour-coded by how tricky they are:</p>
+      <ul class="legend">
+        <li><i class="sw l0"></i> Straightforward</li>
+        <li><i class="sw l1"></i></li>
+        <li><i class="sw l2"></i></li>
+        <li><i class="sw l3"></i> Sneaky</li>
+      </ul>
+      <p class="help-foot">Keyboard: arrow keys move, <kbd>Space</kbd> selects, <kbd>Enter</kbd> submits.</p>
+    </div>
+  </section>
+</div>
+
+<script src="puzzles.js"></script>
+<script src="game.js"></script>
+</body>
+</html>

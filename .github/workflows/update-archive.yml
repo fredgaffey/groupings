@@ -1,0 +1,92 @@
+# Pulls the upstream archive, validates it, and redeploys if it changed.
+#
+# The site serves its own copy of the data — nothing is fetched from a third
+# party at runtime — so staying current is this workflow's job.
+#
+# Requires two repository secrets (Settings > Secrets and variables > Actions):
+#   CLOUDFLARE_API_TOKEN   token with the "Cloudflare Pages: Edit" permission
+#   CLOUDFLARE_ACCOUNT_ID  REDACTED
+name: Update archive
+
+on:
+  schedule:
+    - cron: "0 6 * * *" # 06:00 UTC daily
+  workflow_dispatch: # and on demand from the Actions tab
+
+concurrency:
+  group: update-archive
+  cancel-in-progress: false
+
+env:
+  UPSTREAM: https://raw.githubusercontent.com/Eyefyre/NYT-Connections-Answers/main/connections.json
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # to commit the refreshed archive
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Fetch upstream archive
+        run: curl -sSfL --max-time 120 -o /tmp/upstream.json "$UPSTREAM"
+
+      - name: Sanity-check before overwriting
+        # An upstream truncation or a captive-portal HTML page would otherwise
+        # sail through and wipe a working archive. Refuse to shrink.
+        run: |
+          node -e '
+            const fs = require("fs");
+            const next = JSON.parse(fs.readFileSync("/tmp/upstream.json", "utf8"));
+            const prev = JSON.parse(fs.readFileSync("puzzles.json", "utf8"));
+            if (!Array.isArray(next)) throw new Error("upstream is not an array");
+            if (next.length < prev.length) {
+              throw new Error(`upstream shrank: ${prev.length} -> ${next.length}`);
+            }
+            console.log(`upstream ok: ${prev.length} -> ${next.length} puzzles`);
+          '
+          cp /tmp/upstream.json puzzles.json
+
+      - name: Validate
+        # Exits non-zero only if nothing playable survives, which is the case
+        # worth stopping for. Repairs and drops are reported, not fatal.
+        run: node validate.js
+
+      - name: Has anything changed?
+        id: diff
+        run: |
+          if git diff --quiet -- puzzles.json; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No new puzzles upstream; nothing to do."
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build
+        if: steps.diff.outputs.changed == 'true'
+        run: node build.js
+
+      - name: Commit refreshed archive
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add puzzles.json puzzles.js
+          git commit -m "Refresh archive from upstream
+
+          Automated by .github/workflows/update-archive.yml"
+          git push
+
+      - name: Deploy
+        if: steps.diff.outputs.changed == 'true'
+        # deploy.sh fails closed if the Pages URLs are not behind Access, so a
+        # missing gate stops the deploy here rather than publishing the archive.
+        run: ./deploy.sh
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

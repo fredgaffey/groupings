@@ -107,29 +107,33 @@ once, sixteen distinct upper-case words.
 This is the same shape the common community Connections datasets use, so a
 dump in that format drops straight in — replace `puzzles.json` wholesale.
 
-### Auto-updating
+### Staying current
 
-The game fetches the archive live from the upstream project, so new puzzles
-appear without redeploying:
+The site serves its own copy of the archive — the browser makes **no
+third-party request at runtime**. Refreshing is a build-time job, handled by
+`.github/workflows/update-archive.yml`, which runs daily at 06:00 UTC and on
+demand from the Actions tab:
 
-```
-https://raw.githubusercontent.com/Eyefyre/NYT-Connections-Answers/main/connections.json
-```
+1. fetch the upstream archive
+2. refuse it if it isn't an array or has *fewer* puzzles than the current file
+3. `node validate.js` — aborts only if nothing playable survives
+4. stop early if nothing changed
+5. `node build.js`, commit `puzzles.json` + `puzzles.js`, then `./deploy.sh`
 
-That host sends `access-control-allow-origin: *`, so the browser can read it
-directly. Sources are tried best-first, each falling through to the next:
+Step 2 is the guard that matters: a truncated response or an HTML error page
+would otherwise overwrite a working archive. Both cases are rejected before the
+file is replaced.
 
-1. **fresh cache** — fetched within 6h, kept in `localStorage`
-2. **upstream** — the live archive (8s timeout)
-3. **stale cache** — when the network is down
-4. **local `puzzles.json`** — whatever was last committed
-5. **bundled copy** — `PUZZLES_EMBEDDED`, for `file://`
+The deploy step runs the normal `deploy.sh`, so the Access gate check applies to
+automated deploys too — a missing gate stops the workflow rather than publishing
+the archive.
 
-The archive sheet shows which source was used and when. Normalization runs
-before caching, so the repair work happens once per fetch rather than per load.
+**Required repository secrets** (Settings → Secrets and variables → Actions):
 
-Because the data arrives at runtime, the committed `puzzles.json` is now only a
-fallback — it does not need refreshing for the game to stay current.
+| Secret | |
+|---|---|
+| `CLOUDFLARE_API_TOKEN` | token with the *Cloudflare Pages: Edit* permission |
+| `CLOUDFLARE_ACCOUNT_ID` | the Cloudflare account id |
 
 ### Data loading
 

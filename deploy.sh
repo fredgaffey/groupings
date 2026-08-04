@@ -38,6 +38,12 @@ done
 
 cd "$(dirname "$0")"
 
+# CI runners have node but not a global wrangler; fall back to npx there.
+WRANGLER="${WRANGLER:-wrangler}"
+if ! command -v "$WRANGLER" >/dev/null 2>&1; then
+  WRANGLER="npx --yes wrangler@4"
+fi
+
 # An Access-protected origin redirects to <team>.cloudflareaccess.com, or answers
 # 401/403 outright. Anything else means the URL is serving content unauthenticated.
 is_gated() {
@@ -60,7 +66,7 @@ check_gate() {
   )
 
   local hash_url
-  hash_url=$(wrangler pages deployment list --project-name "$PROJECT" 2>/dev/null \
+  hash_url=$($WRANGLER pages deployment list --project-name "$PROJECT" 2>/dev/null \
     | grep -oE "https://[a-z0-9]+\.${PROJECT}\.pages\.dev" | head -1 || true)
   [[ -n "$hash_url" ]] && urls+=("${hash_url}/" "${hash_url}/puzzles.json")
 
@@ -116,7 +122,7 @@ fi
 
 echo
 echo "==> Deploying to ${PROJECT} (branch ${BRANCH})"
-deploy_out=$(wrangler pages deploy dist \
+deploy_out=$($WRANGLER pages deploy dist \
   --project-name "$PROJECT" \
   --branch "$BRANCH" \
   --commit-dirty=true 2>&1 | tee /dev/stderr)

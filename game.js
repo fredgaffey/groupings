@@ -562,89 +562,26 @@ document.addEventListener("keydown", onKeydown);
  * so fall back to the copy bundle.js embeds in puzzles.js. Both hold the same
  * data; regenerate with `node bundle.js` after editing the JSON.
  */
-const UPSTREAM_URL =
-  "https://raw.githubusercontent.com/Eyefyre/NYT-Connections-Answers/main/connections.json";
-const CACHE_KEY = "groupings:archive:v1";
-const CACHE_TTL = 6 * 60 * 60 * 1000; // 6h — upstream adds at most one puzzle a day
-const FETCH_TIMEOUT = 8000;
-
 /*
- * Sources, best first. Each falls through to the next so the game still opens
- * offline, on a blocked network, or straight off the filesystem:
+ * The archive ships with the site — no third-party call at runtime. It is kept
+ * current by the scheduled rebuild in .github/workflows/update-archive.yml,
+ * which pulls upstream, validates, and redeploys.
  *
- *   1. fresh cache      — fetched within CACHE_TTL
- *   2. upstream         — the live archive, serves CORS-open
- *   3. stale cache      — better than nothing when the network is down
- *   4. local puzzles.json — whatever was last committed
- *   5. PUZZLES_EMBEDDED — the file:// fallback baked in by bundle.js
- *
- * Normalizing before caching means the repair work (deriving lost levels,
- * dropping unusable puzzles) happens once per fetch rather than once per load.
+ * puzzles.json is the source of truth; PUZZLES_EMBEDDED is the mirror that
+ * bundle.js writes, for when index.html is opened over file:// and fetch()
+ * is unavailable.
  */
 async function loadPuzzles() {
-  const cached = readCache();
-  if (cached && Date.now() - cached.fetchedAt < CACHE_TTL) {
-    state.source = { name: "cache", fetchedAt: cached.fetchedAt };
-    return cached.puzzles;
-  }
-
-  try {
-    const puzzles = normalize(await fetchUpstream());
-    if (!puzzles.length) throw new Error("upstream produced no playable puzzles");
-    state.source = { name: "upstream", fetchedAt: Date.now() };
-    writeCache(puzzles);
-    return puzzles;
-  } catch (err) {
-    console.warn("[groupings] upstream fetch failed:", err.message);
-  }
-
-  if (cached) {
-    state.source = { name: "cache (stale)", fetchedAt: cached.fetchedAt };
-    return cached.puzzles;
-  }
-
   try {
     const res = await fetch("puzzles.json", { cache: "no-cache" });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     if (!Array.isArray(data) || !data.length) throw new Error("empty or not an array");
-    state.source = { name: "local puzzles.json", fetchedAt: null };
+    state.source = { name: "puzzles.json", fetchedAt: null };
     return normalize(data);
   } catch {
     state.source = { name: "bundled copy", fetchedAt: null };
     return normalize(typeof PUZZLES_EMBEDDED !== "undefined" ? PUZZLES_EMBEDDED : []);
-  }
-}
-
-async function fetchUpstream() {
-  // Without a timeout a hung connection leaves the board empty indefinitely.
-  const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), FETCH_TIMEOUT);
-  try {
-    const res = await fetch(UPSTREAM_URL, { signal: ctrl.signal });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return await res.json();
-  } finally {
-    clearTimeout(timer);
-  }
-}
-
-function readCache() {
-  try {
-    const raw = localStorage.getItem(CACHE_KEY);
-    if (!raw) return null;
-    const c = JSON.parse(raw);
-    return Array.isArray(c?.puzzles) && c.puzzles.length ? c : null;
-  } catch {
-    return null;
-  }
-}
-
-function writeCache(puzzles) {
-  try {
-    localStorage.setItem(CACHE_KEY, JSON.stringify({ fetchedAt: Date.now(), puzzles }));
-  } catch {
-    // Quota exceeded or storage disabled — the archive just gets re-fetched.
   }
 }
 

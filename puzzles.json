@@ -55612,5 +55612,373 @@
                 ]
             }
         ]
+    },
+    {
+        "id": 1210,
+        "date": "2026-10-08",
+        "answers": [
+            {
+                "level": -1,
+                "group": "FOLLOWS, AS RULES",
+                "members": [
+                    "HEEDS",
+                    "MINDS",
+                    "REGARDS",
+                    "RESPECTS"
+                ]
+            },
+            {
+                "level": -1,
+                "group": "OUTDO",
+                "members": [
+                    "BEST",
+                    "ECLIPSE",
+                    "SURPASS",
+                    "TOP"
+                ]
+            },
+            {
+                "level": -1,
+                "group": "THINGS THAT COME IN THREES",
+                "members": [
+                    "CHEERS",
+                    "STOOGES",
+                    "STRIKES",
+                    "WISHES"
+                ]
+            },
+            {
+                "level": -1,
+                "group": "ENDING IN ACTORS NAMED TOM",
+                "members": [
+                    "AUTOCRUISE",
+                    "FOOLHARDY",
+                    "MULHOLLAND",
+                    "THANKS"
+                ]
+            }
+        ]
+    },
+    {
+        "id": 1211,
+        "date": "2026-10-09",
+        "answers": [
+            {
+                "level": -1,
+                "group": "DECISIVE VICTORY",
+                "members": [
+                    "BLOWOUT",
+                    "ROMP",
+                    "ROUT",
+                    "SWEEP"
+                ]
+            },
+            {
+                "level": -1,
+                "group": "CONTROLLED BY A TV REMOTE",
+                "members": [
+                    "CHANNEL",
+                    "INPUT",
+                    "POWER",
+                    "VOLUME"
+                ]
+            },
+            {
+                "level": -1,
+                "group": "FEATURES OF A SPORTS SHOW",
+                "members": [
+                    "HIGHLIGHTS",
+                    "RECAP",
+                    "SCORES",
+                    "STATS"
+                ]
+            },
+            {
+                "level": -1,
+                "group": "AIR ___",
+                "members": [
+                    "CONDITIONER",
+                    "GUITAR",
+                    "KISS",
+                    "QUOTES"
+                ]
+            }
+        ]
+    },
+    {
+        "id": 1212,
+        "date": "2026-10-10",
+        "answers": [
+            {
+                "level": -1,
+                "group": "USEFUL WHEN WRITING A PAPER",
+                "members": [
+                    "DRAFT",
+                    "NOTES",
+                    "OUTLINE",
+                    "THESIS"
+                ]
+            },
+            {
+                "level": -1,
+                "group": "PRESUME",
+                "members": [
+                    "FIGURE",
+                    "GATHER",
+                    "IMAGINE",
+                    "SUPPOSE"
+                ]
+            },
+            {
+                "level": -1,
+                "group": "SOCIAL MEDIA SECTIONS",
+                "members": [
+                    "FEED",
+                    "MESSAGES",
+                    "NOTIFICATIONS",
+                    "PROFILE"
+                ]
+            },
+            {
+                "level": -1,
+                "group": "___BOXING",
+                "members": [
+                    "BEAT",
+                    "KICK",
+                    "SHADOW",
+                    "UN"
+                ]
+            }
+        ]
+    },
+    {
+        "id": 1213,
+        "date": "2026-10-11",
+        "answers": [
+            {
+                "level": -1,
+                "group": "PUT TO USE",
+                "members": [
+                    "APPLY",
+                    "HARNESS",
+                    "UTILIZE",
+                    "WIELD"
+                ]
+            },
+            {
+                "level": -1,
+                "group": "MONTHLY BILLS",
+                "members": [
+                    "CABLE",
+                    "ELECTRICITY",
+                    "INTERNET",
+                    "PHONE"
+                ]
+            },
+            {
+                "level": -1,
+                "group": "THINGS YOU MIGHT FIND IN A GLOVE COMPARTMENT",
+                "members": [
+                    "GLOVES",
+                    "ICE SCRAPER",
+                    "MAP",
+                    "REGISTRATION"
+                ]
+            },
+            {
+                "level": -1,
+                "group": "ENDING IN GAMBITS",
+                "members": [
+                    "EMPLOY",
+                    "PATRICK",
+                    "PERUSE",
+                    "SYNTACTIC"
+                ]
+            }
+        ]
+    },
+    {
+        "id": 1214,
+        "date": "2026-10-12",
+        "answers": [
+            {
+                "level": -1,
+                "group": "STATUS",
+                "members": [
+                    "CONDITION",
+                    "SHAPE",
+                    "SITUATION",
+                    "STATE"
+                ]
+            },
+            {
+                "level": -1,
+                "group": "TOLERATE",
+                "members": [
+                    "BEAR",
+                    "HANDLE",
+                    "STAND",
+                    "WEATHER"
+                ]
+            },
+            {
+                "level": -1,
+                "group": "WORD SHORTENINGS, OFTEN",
+                "members": [
+                    "ABBREVIATION",
+                    "CONTRACTION",
+                    "ELISION",
+                    "NICKNAME"
+                ]
+            },
+            {
+                "level": -1,
+                "group": "WORDS MADE USING U.S. POSTAL ABBREVIATIONS",
+                "members": [
+                    "ALKYLAMIDE",
+                    "CALAMARI",
+                    "MANDARIN",
+                    "MELAMINE"
+                ]
+            }
+        ]
+    },
+    {
+        "id": 1215,
+        "date": "2026-10-13",
+        "answers": [
+            {
+                "level": -1,
+                "group": "DISCERNMENT",
+                "members": [
+                    "EYE",
+                    "FLAIR",
+                    "SENSE",
+                    "TASTE"
+                ]
+            },
+            {
+                "level": -1,
+                "group": "FASTEN",
+                "members": [
+                    "HITCH",
+                    "LASH",
+                    "TETHER",
+                    "TIE"
+                ]
+            },
+            {
+                "level": -1,
+                "group": "SPORTS CHAMPIONSHIP PRIZES",
+                "members": [
+                    "BELT",
+                    "CUP",
+                    "JACKET",
+                    "RING"
+                ]
+            },
+            {
+                "level": -1,
+                "group": "LOOSE ___",
+                "members": [
+                    "CANNON",
+                    "CHANGE",
+                    "ENDS",
+                    "LIPS"
+                ]
+            }
+        ]
+    },
+    {
+        "id": 1216,
+        "date": "2026-10-14",
+        "answers": [
+            {
+                "level": -1,
+                "group": "HINT",
+                "members": [
+                    "FLICKER",
+                    "SUGGESTION",
+                    "TRACE",
+                    "WHIFF"
+                ]
+            },
+            {
+                "level": -1,
+                "group": "TENNIS SHOTS",
+                "members": [
+                    "SERVE",
+                    "SLICE",
+                    "SMASH",
+                    "VOLLEY"
+                ]
+            },
+            {
+                "level": -1,
+                "group": "SUPERHEROES, WITH \"THE\"",
+                "members": [
+                    "FLASH",
+                    "HULK",
+                    "PUNISHER",
+                    "THING"
+                ]
+            },
+            {
+                "level": -1,
+                "group": "STARTING WITH \"FEE, FI, FO, FUM\"",
+                "members": [
+                    "FEED",
+                    "FIERY",
+                    "FOMENT",
+                    "FUMBLE"
+                ]
+            }
+        ]
+    },
+    {
+        "id": 1217,
+        "date": "2026-10-15",
+        "answers": [
+            {
+                "level": -1,
+                "group": "WAYS TO PRESERVE FOOD",
+                "members": [
+                    "CURE",
+                    "DRY",
+                    "PICKLE",
+                    "SMOKE"
+                ]
+            },
+            {
+                "level": -1,
+                "group": "THINGS YOU CAN SCORE IN SPORTS",
+                "members": [
+                    "BASKET",
+                    "GOAL",
+                    "RUN",
+                    "TOUCHDOWN"
+                ]
+            },
+            {
+                "level": -1,
+                "group": "LOWEST PART",
+                "members": [
+                    "BASE",
+                    "BOTTOM",
+                    "FOOT",
+                    "FOUNDATION"
+                ]
+            },
+            {
+                "level": -1,
+                "group": "LOW LANDFORMS WITH A LETTER CHANGED",
+                "members": [
+                    "CANNON",
+                    "FORGE",
+                    "RACINE",
+                    "VOLLEY"
+                ]
+            }
+        ]
     }
 ]
